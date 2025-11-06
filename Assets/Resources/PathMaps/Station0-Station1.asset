@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 633c2721128f5b246bb5d37216b55530, type: 3}
+  m_Name: Station0-Station1
+  m_EditorClassIdentifier: Assembly-CSharp::PathMapConfig
+  From: 0
+  To: 1
+  Id: '#911'
+  BranchNum: 6
+  Structure:
+  - From: 0
+    To: 1
+    structure:
+    - '"straight", "straight", "straight"'
+  - From: 1
+    To: 2
+    structure:
+    - '"straight", "right", "straight"'
+  - From: 1
+    To: 3
+    structure:
+    - '"straight", "right", "straight"'
+  - From: 2
+    To: 4
+    structure:
+    - '"straight", "straight", "straight"'
+  - From: 2
+    To: 5
+    structure:
+    - '"straight", "straight", "leftArc"'
+  - From: 3
+    To: 4
+    structure:
+    - '"straight", "straight", "leftArc"'
+  - From: 3
+    To: 5
+    structure:
+    - '"straight", "left", "straight"'
+  - From: 4
+    To: 5
+    structure:
+    - '"straight", "straight", "straight"'
