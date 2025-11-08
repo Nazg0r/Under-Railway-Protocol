@@ -1,34 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public class PathMapFactory
 {
-	private string _pathMapName = "StationName-StationName";
-	private readonly BranchTypes _branchTypes = Resources.Load<BranchTypes>("Configs/BranchTypes");
+	private string _pathMapName;
+	private readonly BranchStructureTypeFactory _branchTypeFactory = new();
 
-	public PathMap Create(PathMapConfig config, List<Station> stations)
+	public PathMap Create(PathMapConfig config, List<Station> stations, BranchStructures structures)
 	{
 		_pathMapName = $"{stations[0].Name}-{stations[1].Name}";
-		List<Branch> branches = CreateBranches(config);
+		List<Branch> branches = CreateBranches(config, structures);
 		CreateRailroads(branches, config);
 		return new PathMap(config.Id, branches.First(), stations[0], stations[1]);
 	}
 
-	private List<Branch> CreateBranches(PathMapConfig config)
+	private List<Branch> CreateBranches(PathMapConfig config, BranchStructures structures)
 	{
 		List<Branch> branches = new(config.BranchNum);
 
 		for (var i = 0; i < config.BranchNum; i++)
 		{
-			int railroadsCount = config.Structure.Count(c => c.From == i || c.To == i);
-
-			var type = _branchTypes
-				.Bindings
-				.FirstOrDefault(b => b.RailroadsCount == railroadsCount)
-				.TypeName;
-
 			string name = $"{_pathMapName}-Branch{i}";
+			var structureName = structures
+				.Bindings
+				.FirstOrDefault(b => b.BranchIndex == i)
+				.StructureName;
+			var type = _branchTypeFactory.Create(structureName);
+
 			branches.Add(new Branch(type, name));
 		}
 
