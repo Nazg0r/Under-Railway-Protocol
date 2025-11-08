@@ -12,7 +12,6 @@ public class RailroadPiece
 		Type = type;
 		StartPoint = startPoint;
 		EndPoint = endPoint;
-		Rotation = Quaternion.identity;
-		Rotation.eulerAngles.Set(0f, (float)type, 0f);
+		Rotation = Quaternion.Euler(0, (float)type, 0);
 	}
 }
