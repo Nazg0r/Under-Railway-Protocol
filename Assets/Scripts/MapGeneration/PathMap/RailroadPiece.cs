@@ -7,11 +7,11 @@ public class RailroadPiece
 	public Vector2 EndPoint { get; set; }
 	public Quaternion Rotation { get;}
 
-	public RailroadPiece(DirectionType type, Vector2 startPoint, Vector2 endPoint)
+	public RailroadPiece(DirectionType type, Vector2 startPoint, Vector2 endPoint, Quaternion rotation)
 	{
 		Type = type;
 		StartPoint = startPoint;
 		EndPoint = endPoint;
-		Rotation = Quaternion.Euler(0, (float)type, 0);
+		Rotation = rotation;
 	}
 }
