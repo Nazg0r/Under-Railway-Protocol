@@ -20,12 +20,9 @@ MonoBehaviour:
   - Type: 0
     StartPoint: {x: 0, y: 1}
     EndPoint: {x: 0, y: 2}
-  - Type: 2
+  - Type: -45
     StartPoint: {x: 0, y: 1}
     EndPoint: {x: 1.4142135, y: 2.4142137}
-  - Type: 2
+  - Type: -45
     StartPoint: {x: 1.414214, y: 2.414214}
     EndPoint: {x: 2.8284276, y: 3.8284276}
-  - Type: 2
-    StartPoint: {x: 0, y: 1}
-    EndPoint: {x: 1.4142135, y: 2.4142137}
