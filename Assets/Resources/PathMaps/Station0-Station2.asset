@@ -13,51 +13,80 @@ MonoBehaviour:
   m_Name: Station0-Station2
   m_EditorClassIdentifier: Assembly-CSharp::PathMapConfig
   From: 0
-  To: 2
+  To: 1
   Id: '#912'
-  BranchNum: 8
+  BranchNum: 6
   Structure:
   - From: 0
     To: 1
     structure:
-    - '"straight", "straight", "straight"'
-  - From: 0
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+  - From: 1
     To: 2
     structure:
-    - '"straight", "right", "straight"'
-  - From: 0
+    - Right
+    - Forward
+    - Forward
+    - Left
+    - Forward
+    - Forward
+  - From: 1
     To: 3
     structure:
-    - '"straight", "right", "straight"'
-  - From: 1
+    - Left
+    - Forward
+    - Left
+    - Forward
+    - Forward
+    - Forward
+    - Right
+    - Right
+    - Forward
+    - Forward
+  - From: 2
     To: 4
     structure:
-    - '"straight", "straight", "straight"'
-  - From: 1
-    To: 5
-    structure:
-    - '"straight", "straight", "leftArc"'
+    - Left
+    - Left
+    - Forward
+    - Right
+    - Right
+    - Left
   - From: 2
-    To: 6
+    To: 5
     structure:
-    - '"straight", "straight", "leftArc"'
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Left
+    - Forward
+    - Left
+    - Forward
+    - Right
+    - Right
   - From: 3
-    To: 6
+    To: 4
     structure:
-    - '"straight", "left", "straight"'
+    - Right
+    - Forward
+    - Forward
+    - Right
+    - Left
+    - Left
+  - From: 3
+    To: 5
+    structure:
+    - Forward
   - From: 4
     To: 5
     structure:
-    - '"straight", "straight", "straight"'
-  - From: 4
-    To: 7
-    structure:
-    - '"straight", "straight", "straight"'
-  - From: 5
-    To: 6
-    structure:
-    - '"straight", "straight", "straight"'
-  - From: 4
-    To: 5
-    structure:
-    - '"straight", "straight", "straight"'
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward

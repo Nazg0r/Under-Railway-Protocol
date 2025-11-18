@@ -81,7 +81,7 @@ MonoBehaviour:
   - From: 3
     To: 5
     structure:
-    - '"straight", "left", "straight"'
+    - Forward
   - From: 4
     To: 5
     structure:
