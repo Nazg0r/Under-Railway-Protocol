@@ -11,7 +11,10 @@ public class GameManager : MonoBehaviour
 	public event Action<GameState> OnGameStateChanged;
 	public event Func<GameState, Task> OnGameStateChangedAsync;
 
-    public async Task Initialize()
+	public Station CurrentStation { get; private set; }
+	public Station SecondStation { get; private set; }
+
+	public async Task Initialize()
     {
 		ObjectResolver.Register(this);
 	}
@@ -50,6 +53,16 @@ public class GameManager : MonoBehaviour
 	private void HandleStateEnter(GameState state)
 	{
 		Debug.Log($"[GameManager]: Enter to state \"{state}\"");
+	}
+
+	public void SetCurrentStation(Station station)
+	{
+		CurrentStation = station;
+	}
+
+	public void SetNextStation(Station station)
+	{
+		CurrentStation = station;
 	}
 
 }

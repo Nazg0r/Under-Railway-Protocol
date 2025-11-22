@@ -3,18 +3,15 @@ using UnityEngine;
 public class MapGenerationManager : MonoBehaviour
 {
 	public Map Map { get; private set;  }
+	private GameManager _gameManager;
 
-	private void Awake()
-	{
+	public void Initialize(){
 		ObjectResolver.Register(this);
-	}
+		_gameManager = ObjectResolver.Resolve<GameManager>();
 
-	public void Initialize() =>
-		CreateMap();
+		MapFactory factory = new();
+		Map = factory.Create();
 
-	private void CreateMap()
-	{
-		MapFactory _factory = new();
-		Map = _factory.Create();
+		_gameManager.SetCurrentStation(Map.InitialStation);
 	}
 }
