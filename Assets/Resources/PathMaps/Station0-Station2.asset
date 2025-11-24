@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Station0-Station2
   m_EditorClassIdentifier: Assembly-CSharp::PathMapConfig
   From: 0
-  To: 1
+  To: 2
   Id: '#912'
-  BranchNum: 6
+  BranchNum: 8
   Structure:
   - From: 0
     To: 1
@@ -24,69 +24,116 @@ MonoBehaviour:
     - Forward
     - Forward
     - Forward
-    - Forward
   - From: 1
     To: 2
     structure:
+    - Left
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
     - Right
     - Forward
     - Forward
-    - Left
+    - Forward
+    - Forward
+    - Forward
+    - Forward
     - Forward
     - Forward
   - From: 1
     To: 3
     structure:
-    - Left
     - Forward
-    - Left
     - Forward
     - Forward
     - Forward
     - Right
     - Right
-    - Forward
-    - Forward
-  - From: 2
-    To: 4
+    - Left
+    - Left
+  - From: 3
+    To: 2
     structure:
     - Left
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Right
+  - From: 1
+    To: 4
+    structure:
+    - Right
+    - Right
+    - Forward
+    - Forward
+    - Forward
+    - Left
+    - Left
+    - Right
+    - Forward
+    - SmallForward
     - Left
     - Forward
-    - Right
-    - Right
     - Left
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Right
+  - From: 3
+    To: 4
+    structure:
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
   - From: 2
     To: 5
     structure:
     - Forward
     - Forward
     - Forward
-    - Forward
-    - Left
-    - Forward
-    - Left
-    - Forward
     - Right
     - Right
-  - From: 3
-    To: 4
-    structure:
-    - Right
     - Forward
     - Forward
-    - Right
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
     - Left
     - Left
-  - From: 3
-    To: 5
-    structure:
-    - Forward
   - From: 4
     To: 5
     structure:
+    - Right
+    - Right
+    - SmallForward
+    - Left
     - Forward
+    - SmallForward
     - Forward
+    - SmallForward
     - Forward
-    - Forward
+    - SmallForward
+    - Left
+    - SmallForward
     - Forward

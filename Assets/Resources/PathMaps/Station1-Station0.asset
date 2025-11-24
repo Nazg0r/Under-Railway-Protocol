@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 633c2721128f5b246bb5d37216b55530, type: 3}
-  m_Name: Station0-Station1
+  m_Name: Station1-Station0
   m_EditorClassIdentifier: Assembly-CSharp::PathMapConfig
-  From: 0
-  To: 1
-  Id: '#913'
+  From: 1
+  To: 0
+  Id: '#911'
   BranchNum: 6
   Structure:
   - From: 0
@@ -25,10 +25,31 @@ MonoBehaviour:
     - Forward
     - Forward
     - Forward
-  - From: 1
+  - From: 0
     To: 2
     structure:
+    - Left
+    - Left
+    - Forward
     - Right
+    - Forward
+    - SmallForward
+    - Right
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+    - Forward
+  - From: 0
+    To: 3
+    structure:
+    - Right
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
     - Forward
     - SmallForward
     - Forward
@@ -36,80 +57,48 @@ MonoBehaviour:
     - Left
     - Forward
     - Forward
+    - Forward
+    - Forward
+    - Forward
+  - From: 3
+    To: 4
+    structure:
+    - Forward
+    - Forward
+    - Left
+    - Left
+    - Forward
+    - Forward
+    - Forward
+    - Right
+    - Forward
+    - SmallForward
+    - Right
   - From: 1
     To: 3
     structure:
-    - Left
-    - Forward
-    - SmallForward
-    - Left
-    - Forward
-    - Forward
-    - Forward
-    - Right
-    - Right
-    - Forward
-    - Forward
-  - From: 2
-    To: 4
-    structure:
-    - Left
-    - SmallForward
-    - Forward
-    - Left
     - Right
     - Forward
     - SmallForward
-    - Right
     - Forward
-  - From: 2
-    To: 5
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Left
+  - From: 1
+    To: 2
     structure:
     - Forward
-    - Forward
-    - Forward
-    - Forward
-    - Forward
-    - Forward
-    - Forward
     - Left
     - Forward
     - SmallForward
     - Left
-    - Forward
-    - Right
-    - Right
-  - From: 3
-    To: 4
-    structure:
     - Right
     - Forward
     - SmallForward
-    - Forward
-    - SmallForward
-    - Forward
-    - SmallForward
-    - Forward
-    - SmallForward
-    - Left
-  - From: 3
-    To: 5
-    structure:
-    - Forward
-    - Forward
-    - Forward
-    - Forward
-    - Forward
     - Right
-    - Forward
-    - SmallForward
-    - Forward
-    - SmallForward
-    - Forward
-    - SmallForward
-    - Forward
-    - SmallForward
-    - Left
   - From: 4
     To: 5
     structure:
@@ -118,3 +107,14 @@ MonoBehaviour:
     - Forward
     - Forward
     - Forward
+  - From: 2
+    To: 4
+    structure:
+    - Forward
+    - Forward
+    - Right
+    - Forward
+    - SmallForward
+    - Forward
+    - SmallForward
+    - Left
