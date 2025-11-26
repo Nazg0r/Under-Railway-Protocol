@@ -4,6 +4,8 @@ public class GamePreparationManager : MonoBehaviour
 {
 	[SerializeField] MapGenerationManager _mapGenerationManager;
 	[SerializeField] MapMonitorPreparationManager _mapMonitorPreparationManager;
+	[SerializeField] private InputSwitcher _inputSwitcher;
+
 	private GameManager _gameManager;
 
 	private void Awake()
@@ -18,6 +20,7 @@ public class GamePreparationManager : MonoBehaviour
 	{
 		if (state == GameState.Preparation)
 		{
+			_inputSwitcher.Initialize();
 			_mapGenerationManager.Initialize();
 			_mapMonitorPreparationManager.Initialize();
 		}

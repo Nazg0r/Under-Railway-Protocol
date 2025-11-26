@@ -108,6 +108,7 @@ public class MapMonitorController : MonoBehaviour
 			_configuredPathMaps.Add(_currentPathMap);
 		}
 
+		EventSystem.current.SetSelectedGameObject(null);
 		EventSystem.current.SetSelectedGameObject(_currentPointsConfig.First().Point.gameObject);
 	}
 
@@ -119,6 +120,7 @@ public class MapMonitorController : MonoBehaviour
 		_mapMonitorInputController.gameObject.SetActive(false);
 		_mapMonitorManager.SetPathMapOnChoicePosition();
 
+		EventSystem.current.SetSelectedGameObject(null);
 		EventSystem.current.SetSelectedGameObject(_mapMonitorChoiceMenuManager.ChoiceMenuButtons.First().gameObject);
 
 		_activePoints.Clear();

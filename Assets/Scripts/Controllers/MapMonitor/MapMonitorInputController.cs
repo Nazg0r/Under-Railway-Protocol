@@ -21,7 +21,7 @@ public class MapMonitorInputController : MonoBehaviour
 
 	private void OnEnable()
 	{
-		_inputs.Enable();
+		_inputs.MapMonitor.Enable();
 		_inputs.MapMonitor.BackToMenu.performed += OnBackToMenuPressed;
 		_inputs.MapMonitor.BuildPath.performed += OnBuildPathPressed;
 	}
@@ -30,7 +30,7 @@ public class MapMonitorInputController : MonoBehaviour
 	{
 		_inputs.MapMonitor.BackToMenu.performed -= OnBackToMenuPressed;
 		_inputs.MapMonitor.BuildPath.performed -= OnBuildPathPressed;
-		_inputs.Disable();
+		_inputs.MapMonitor.Disable();
 	}
 
 	private void OnBackToMenuPressed(InputAction.CallbackContext ctx) =>
