@@ -14,7 +14,7 @@ public class CameraSwitcherInput : MonoBehaviour
     public float transitionSpeed = 3f;
 
     private bool isActive = false;
-    private PlayerControls playerControls;
+    private GameInputs playerControls;
     private CinemachineCamera activeMonitorCamera;
     private MonitorTarget activeMonitor;
     private LocalEventManager activeMonitorEvents;
@@ -23,7 +23,7 @@ public class CameraSwitcherInput : MonoBehaviour
     {
         if (playerControls == null)
         {
-            playerControls = new PlayerControls();
+            playerControls = new GameInputs();
             playerControls.Interact.Focus.performed += OnActivate;
             playerControls.Interact.Blur.performed += OnExit;
         }

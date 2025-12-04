@@ -10,7 +10,7 @@ public class MonitorLoad : MonoBehaviour
     private LocalEventManager events;
     private MonitorsManager manager;
     private LocalEventManager managerEvents;
-    private MonitorControls controls;
+    private GameInputs controls;
 
     private Canvas canvas;
     private GameObject main;
@@ -73,7 +73,7 @@ public class MonitorLoad : MonoBehaviour
         canvas = elements.canvas;
         main = elements.main;
         
-        controls = new MonitorControls();
+        controls = new GameInputs();
         events = GetComponent<LocalEventManager>();
         manager = MonitorsManager.Instance;
 

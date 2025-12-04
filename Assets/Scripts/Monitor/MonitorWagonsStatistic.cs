@@ -6,7 +6,7 @@ public class MonitorWagonsStatistic : MonoBehaviour
 {
     private LocalEventManager events;
     private MonitorsManager manager;
-    private MonitorControls controls;
+    private GameInputs controls;
 
     private GameObject main;
 
@@ -46,7 +46,7 @@ public class MonitorWagonsStatistic : MonoBehaviour
         MonitorElements elements = GetComponent<MonitorElements>();
         main = elements.main;
         
-        controls = new MonitorControls();
+        controls = new GameInputs();
         events = GetComponent<LocalEventManager>();
         manager = MonitorsManager.Instance;
 

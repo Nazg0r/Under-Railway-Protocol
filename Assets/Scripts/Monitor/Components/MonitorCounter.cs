@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class MonitorCounter : MonoBehaviour
 {
     private LocalEventManager events;
-    private MonitorControls controls;
+    private GameInputs controls;
 
     public GameObject label;
     public Image background;
@@ -39,7 +39,7 @@ public class MonitorCounter : MonoBehaviour
 
     void Awake()
     {
-        controls = new MonitorControls();
+        controls = new GameInputs();
 
         events = GetComponent<LocalEventManager>();
         events.Subscribe("OnFocus", OnFocus);

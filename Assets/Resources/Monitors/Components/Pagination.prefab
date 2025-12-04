@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1/1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
-  m_sharedMaterial: {fileID: 2702038694442666168, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
+  m_sharedMaterial: {fileID: 2702038694442666168, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -278,8 +278,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: <
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
-  m_sharedMaterial: {fileID: 2702038694442666168, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
+  m_sharedMaterial: {fileID: 2702038694442666168, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -396,7 +396,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2674951978642032490}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c1feb7676bcbbf4a89f2b9423afe153, type: 3}
+  m_Script: {fileID: 11500000, guid: e9a713b5f5f311e4c8fdcec3291682aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalEventManager
 --- !u!114 &1591193048311792889
@@ -422,7 +422,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2674951978642032490}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 772ce1014e002b845a95ecf79dc545ef, type: 3}
+  m_Script: {fileID: 11500000, guid: 11b83ca6e90b18f4b923f579744dbce9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonitorPagination
   wrapper: {fileID: 2674951978642032490}
@@ -432,6 +432,10 @@ MonoBehaviour:
   nextButton: {fileID: 6193048411125502153}
   blocksWrapper: {fileID: 0}
   blocksList: []
+  onFocus: 0
+  isActive: 0
+  paged: 1
+  pages: 1
 --- !u!1 &4614990630776321325
 GameObject:
   m_ObjectHideFlags: 0
@@ -499,8 +503,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: '>'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
-  m_sharedMaterial: {fileID: 2702038694442666168, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
+  m_sharedMaterial: {fileID: 2702038694442666168, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

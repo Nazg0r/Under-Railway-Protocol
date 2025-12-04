@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
-  m_sharedMaterial: {fileID: 2702038694442666168, guid: 1f4ffd3653c64b0478d3eb23aca81ae9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
+  m_sharedMaterial: {fileID: 2702038694442666168, guid: a72bc87b6c86ef44b91c5636c1fbaecf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -268,7 +268,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5249627544996211463}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c1feb7676bcbbf4a89f2b9423afe153, type: 3}
+  m_Script: {fileID: 11500000, guid: e9a713b5f5f311e4c8fdcec3291682aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalEventManager
 --- !u!114 &227704875526627060
@@ -280,6 +280,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 5249627544996211463}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48c1a613ec6a40c4a8ac9ee31967c23a, type: 3}
+  m_Script: {fileID: 11500000, guid: 14e60cb0b8c098141ab79102098c9a90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonitorButton

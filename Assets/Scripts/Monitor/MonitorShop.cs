@@ -32,7 +32,7 @@ public class MonitorShop : MonoBehaviour
     
     private MonitorHeader header;
 
-    private MonitorControls controls;
+    private GameInputs controls;
 
     private UIMonitorFactory.StartPlace startPlace;
 
@@ -67,7 +67,7 @@ public class MonitorShop : MonoBehaviour
         canvas = elements.canvas;
         main = elements.main;
         
-        controls = new MonitorControls();
+        controls = new GameInputs();
         events = GetComponent<LocalEventManager>();
         manager = MonitorsManager.Instance;
     }

@@ -12,7 +12,7 @@ public class MonitorAcceptedQuests : MonoBehaviour
 
     private Canvas canvas;
     private GameObject main;
-    private MonitorControls controls;
+    private GameInputs controls;
     private MonitorsManager manager;
 
     private GameObject loadingPopup;
@@ -59,7 +59,7 @@ public class MonitorAcceptedQuests : MonoBehaviour
         canvas = elements.canvas;
         main = elements.main;
 
-        controls = new MonitorControls();
+        controls = new GameInputs();
         events = GetComponent<LocalEventManager>();
         manager = MonitorsManager.Instance;
     }

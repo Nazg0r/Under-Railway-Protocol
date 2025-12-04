@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 0d06248d0ecfd354b9b3b2110e005073, type: 3}
+  m_Texture: {fileID: 2800000, guid: 6948ea2e426a6a44b8b1f2d23d381c0f, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -496,7 +496,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4497856306517893327}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c1feb7676bcbbf4a89f2b9423afe153, type: 3}
+  m_Script: {fileID: 11500000, guid: e9a713b5f5f311e4c8fdcec3291682aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalEventManager
 --- !u!114 &5582665058068993153
@@ -508,7 +508,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4497856306517893327}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbfc6a6ce95cb804f8de9910026bfbc9, type: 3}
+  m_Script: {fileID: 11500000, guid: d216ad6bcd7c17d43b12d8c0119bb70a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonitorElements
   canvas: {fileID: 6425307822574404196}
@@ -729,7 +729,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: b42baa9d09619404aa3d29492b05247e, type: 3}
+  m_Texture: {fileID: 2800000, guid: d85eaf20f9fdd7648bc31e16b71e101c, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0

@@ -8,7 +8,7 @@ public class MonitorPagination : MonoBehaviour
     
     private LocalEventManager events;
     private MonitorsManager manager;
-    private MonitorControls controls;
+    private GameInputs controls;
 
     public GameObject wrapper;
     public Image background;
@@ -28,7 +28,7 @@ public class MonitorPagination : MonoBehaviour
         events = GetComponent<LocalEventManager>();
         events.Subscribe("OnFocus", OnFocus);
         events.Subscribe("OnBlur", OnBlur);
-        controls = new MonitorControls();
+        controls = new GameInputs();
     }
 
     void OnEnable()
