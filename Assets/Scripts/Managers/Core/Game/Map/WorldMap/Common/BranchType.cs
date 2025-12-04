@@ -1,9 +1,9 @@
-﻿// public enum BranchType
-// {
-// 	Forward,
-// 	LeftForward,
-// 	RightForward,
-// 	LeftRight,
-// 	LeftForwardRight,
-// 	None
-// }
+﻿public enum BranchType
+{
+	Forward,
+	LeftForward,
+	RightForward,
+	LeftRight,
+	LeftForwardRight,
+	None
+}

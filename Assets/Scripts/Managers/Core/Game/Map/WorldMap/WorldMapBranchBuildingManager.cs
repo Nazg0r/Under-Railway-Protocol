@@ -43,16 +43,6 @@ public class WorldMapBranchBuildingManager : MonoBehaviour
 
 	}
 
-	public enum BranchType
-	{
-		Forward,
-		LeftForward,
-		RightForward,
-		LeftRight,
-		LeftForwardRight,
-		None
-	}
-
 	public void CreateBranches(PathMap pathMap, Transform parent)
 	{
 		GameObject branchesContainer = new GameObject("Branches");

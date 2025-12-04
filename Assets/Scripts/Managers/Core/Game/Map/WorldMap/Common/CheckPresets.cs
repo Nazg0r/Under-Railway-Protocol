@@ -1,9 +1,9 @@
 ﻿public struct CheckPresets
 {
-	public readonly WorldMapBranchBuildingManager.BranchType CheckType;
-	public readonly WorldMapBranchBuildingManager.BranchType ReverseMatchType;
+	public readonly BranchType CheckType;
+	public readonly BranchType ReverseMatchType;
 
-	public CheckPresets(WorldMapBranchBuildingManager.BranchType checkType, WorldMapBranchBuildingManager.BranchType reverseMatchType)
+	public CheckPresets(BranchType checkType, BranchType reverseMatchType)
 	{
 		CheckType = checkType;
 		ReverseMatchType = reverseMatchType;

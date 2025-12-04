@@ -3,6 +3,6 @@
 [System.Serializable]
 public class BranchTypeConfigsEntry
 {
-	public WorldMapBranchBuildingManager.BranchType BranchType;
+	public BranchType BranchType;
 	public List<BranchTypeConfig> Configs;
 }

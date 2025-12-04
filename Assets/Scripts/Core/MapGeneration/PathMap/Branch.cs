@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Branch : IMapNode<Railroad>
 {
 	private Vector2 _basePoint = Vector2.zero;
 	public string Name { get; }
-	public BranchStructureType Type { get; }
 	public List<Railroad> Roads { get; } = new();
 
 	public Vector2 BasePoint { get; set; }
@@ -22,9 +20,8 @@ public class Branch : IMapNode<Railroad>
 
 	List<Railroad> IMapNode<Railroad>.Connections => Roads;
 
-	public Branch(BranchStructureType type, string name)
+	public Branch(string name)
 	{
-		Type = type;
 		Name = name;
 	}
 

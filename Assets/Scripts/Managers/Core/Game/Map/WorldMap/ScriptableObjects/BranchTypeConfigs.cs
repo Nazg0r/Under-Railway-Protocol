@@ -6,14 +6,14 @@ public class BranchTypeConfigs : ScriptableObject
 {
 	public List<BranchTypeConfigsEntry> Entries;
 
-	private Dictionary<WorldMapBranchBuildingManager.BranchType, IEnumerable<BranchTypeConfig>> _cache;
+	private Dictionary<BranchType, IEnumerable<BranchTypeConfig>> _cache;
 
-	public Dictionary<WorldMapBranchBuildingManager.BranchType, IEnumerable<BranchTypeConfig>> GetDictionary()
+	public Dictionary<BranchType, IEnumerable<BranchTypeConfig>> GetDictionary()
 	{
 		if (_cache != null)
 			return _cache;
 
-		_cache = new Dictionary<WorldMapBranchBuildingManager.BranchType, IEnumerable<BranchTypeConfig>>();
+		_cache = new Dictionary<BranchType, IEnumerable<BranchTypeConfig>>();
 
 		foreach (var entry in Entries)
 		{
