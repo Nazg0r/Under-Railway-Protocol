@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Cinemachine;
 using UnityEditor;
+using System.Collections;
 
 public class MonitorTarget : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class MonitorTarget : MonoBehaviour
         }
 
         Transform transform = instance.GetComponent<Transform>();
-        transform.position = new Vector3(manager.monitorsLength, 0, 0);
+        transform.position = new Vector3(manager.monitorsLength * 1000, 0, 0);
     }
 
     private void OnFocus()

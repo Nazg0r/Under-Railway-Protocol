@@ -14,6 +14,7 @@ public class UIMonitorFactory
     private Button button;
     private GameObject counterPrefab;
     private GameObject paginationPrefab;
+    private RawImage tabsBorder;
 
     public class ListItem
     {
@@ -51,6 +52,7 @@ public class UIMonitorFactory
         text = Resources.Load<GameObject>("Monitors/Components/Text");
         counterPrefab = Resources.Load<GameObject>("Monitors/Components/Counter");
         paginationPrefab = Resources.Load<GameObject>("Monitors/Components/Pagination");
+        tabsBorder = Resources.Load<RawImage>("Monitors/Components/TabsBorder");
     }
 
     public MonitorHeader Header(string title, string infoName, string infoValue, RectTransform wrapper)
@@ -209,6 +211,49 @@ public class UIMonitorFactory
         GameObject blocks = Instance.Layout("vertical", 72f, innerRect);
         RectTransform blocksRect = blocks.GetComponent<RectTransform>();
         blocksRect.sizeDelta = new Vector2(1288, 1214);
+
+        VerticalLayoutGroup blocksLayout = blocks.GetComponent<VerticalLayoutGroup>();
+        blocksLayout.childControlHeight = true;
+        blocksLayout.childForceExpandHeight = true;
+        blocksLayout.childControlWidth = true;
+        blocksLayout.childForceExpandWidth = true;
+
+        Canvas.ForceUpdateCanvases();
+
+        return new StartPlace
+        {
+            navigation = navigationRect,
+            blocks = blocksRect
+        };
+    }
+
+    public StartPlace StartWithTabs(RectTransform mainRect)
+    {
+        GameObject inner = Instance.Layout("vertical", 0f, mainRect);
+        RectTransform innerRect = inner.GetComponent<RectTransform>();
+        innerRect.sizeDelta = new Vector2(1948, 1283);
+        innerRect.anchoredPosition = new Vector2(0, -190);
+        VerticalLayoutGroup innerLayout = inner.GetComponent<VerticalLayoutGroup>();
+        innerLayout.childAlignment = TextAnchor.UpperCenter;
+
+        GameObject navigation = Instance.Layout("horizontal", 64f, innerRect);
+        RectTransform navigationRect = navigation.GetComponent<RectTransform>();
+        navigationRect.sizeDelta = new Vector2(1948, 110);
+        HorizontalLayoutGroup navigationLayout = navigation.GetComponent<HorizontalLayoutGroup>();
+        navigationLayout.childControlWidth = false;
+        navigationLayout.childForceExpandWidth = false;
+
+        GameObject blocksWrapper = new("Blocks Wrapper");
+        RectTransform blocksWrapperRect = blocksWrapper.AddComponent<RectTransform>();
+        blocksWrapperRect.sizeDelta = new Vector2(1618, 1150);
+        blocksWrapperRect.transform.SetParent(innerRect);
+        blocksWrapperRect.localScale = new Vector3(1, 1, 1);
+        
+        Object.Instantiate(tabsBorder, blocksWrapperRect);
+
+        GameObject blocks = Instance.Layout("vertical", 72f, blocksWrapperRect);
+        RectTransform blocksRect = blocks.GetComponent<RectTransform>();
+        blocksRect.sizeDelta = new Vector2(1618, 1150);
 
         VerticalLayoutGroup blocksLayout = blocks.GetComponent<VerticalLayoutGroup>();
         blocksLayout.childControlHeight = true;

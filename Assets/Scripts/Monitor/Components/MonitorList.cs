@@ -27,12 +27,12 @@ public class MonitorList : MonoBehaviour
             listItemLayout.childControlHeight = false;
             listItemLayout.childControlWidth = false;
             listItemLayout.childForceExpandHeight = false;
-            listItemLayout.childAlignment = TextAnchor.UpperLeft;
+            listItemLayout.childAlignment = TextAnchor.MiddleLeft;
             listItemLayout.spacing = 16f;
 
             GameObject label = Instantiate(text, listItemRect);
             RectTransform labelRect = label.GetComponent<RectTransform>();
-            labelRect.sizeDelta = new Vector2(466, mode == UIMonitorFactory.ListMode.Medium ? 128 : 64);
+            labelRect.sizeDelta = new Vector2(466, 64);
 
             TMP_Text labelText = label.GetComponent<TMP_Text>();
             labelText.text = item.label;

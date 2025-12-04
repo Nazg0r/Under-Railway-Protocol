@@ -13,6 +13,7 @@ public class MonitorButton : MonoBehaviour
     private Image background;
     private TMP_Text text;
     private Button current;
+    public float? height;
 
     Color primaryColor = Color.black;
     Color secondaryColor = new(172f / 255f, 16f / 255f, 16f / 255f);
@@ -49,7 +50,7 @@ public class MonitorButton : MonoBehaviour
 
         float paddingX = 5f;
 
-        rect.sizeDelta = new Vector2(textSize.x + paddingX, text.fontSize + 5f);
+        rect.sizeDelta = new Vector2(textSize.x + paddingX, height ?? text.fontSize + 5f);
     }
     
     public void SetTitle(string title)

@@ -8,7 +8,6 @@ using UnityEngine.UI;
 [RequireComponent(typeof(LocalEventManager))]
 public class MonitorCounter : MonoBehaviour
 {
-
     private LocalEventManager events;
     private MonitorControls controls;
 

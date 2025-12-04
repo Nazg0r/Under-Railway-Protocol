@@ -217,20 +217,19 @@ public class MonitorShop : MonoBehaviour
         }
     }
 
-    IEnumerator LoadAfter()
+    IEnumerator LoadAfter(bool? success = null)
     {
         yield return new WaitForSeconds(1f);
+        if(success != null)
+        {
+            loadingPopup.GetComponentInChildren<TMP_Text>().text = success == true ? "Success" : "Fail";
+            yield return new WaitForSeconds(1f);
+        }
+
         isLoading = false;
         isConnected = true;
         loadingPopup.SetActive(false);
-    }
-
-    IEnumerator BuyTargetSuccess()
-    {
-        MonitorButton submit = itemsList[currentIndex].submit.GetComponent<MonitorButton>();
-        submit.SetTitle("Success");
-        yield return new WaitForSeconds(1f);
-        submit.SetTitle("Buy");
+        if(success != null) loadingPopup.GetComponentInChildren<TMP_Text>().text = "Loading";
     }
 
     private void Buy()
@@ -244,6 +243,10 @@ public class MonitorShop : MonoBehaviour
         double price = item.pricePerOne * counter.value;
         if (manager.playerData.wallet - price <= 0) return;
         if (available - counter.value < 0) return;
+
+        isLoading = true;
+        loadingPopup.SetActive(true);
+        StartCoroutine(LoadAfter(true));
 
         manager.playerData.wallet -= price;
         header.SetValue(manager.playerData.wallet + "$");
@@ -271,7 +274,6 @@ public class MonitorShop : MonoBehaviour
         total.Render(GenerateShopTotal(item), itemsList[currentIndex].total.GetComponent<RectTransform>(), UIMonitorFactory.ListMode.Large);
 
         counter.Reset();
-        StartCoroutine(BuyTargetSuccess());
     }
 
     private void OnSubmit()
