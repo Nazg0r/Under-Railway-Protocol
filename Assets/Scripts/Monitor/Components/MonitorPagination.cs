@@ -18,7 +18,8 @@ public class MonitorPagination : MonoBehaviour
     public RectTransform blocksWrapper;
     public List<GameObject> blocksList;
 
-    private bool onFocus = false;
+    public bool onFocus = false;
+    public bool isActive = false;
     public int paged = 1;
     public int pages = 1;
 
@@ -57,6 +58,7 @@ public class MonitorPagination : MonoBehaviour
     private void OnFocus()
     {
         onFocus = true;
+        isActive = true;
 
         background.color = manager.secondaryColor;
         page.color = manager.primaryColor;
@@ -69,6 +71,7 @@ public class MonitorPagination : MonoBehaviour
     private void OnBlur()
     {
         onFocus = false;
+        isActive = false;
 
         background.color = manager.primaryColor;
         page.color = manager.secondaryColor;
@@ -114,7 +117,7 @@ public class MonitorPagination : MonoBehaviour
 
     private void OnChange(Vector2 direction)
     {
-        if (!onFocus) return;
+        if (!onFocus || !isActive) return;
 
         if (direction.x > 0.5f)
         {

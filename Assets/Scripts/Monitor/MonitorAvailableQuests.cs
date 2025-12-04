@@ -29,15 +29,32 @@ public class MonitorAvailableQuests : MonoBehaviour
         public List<Button> submit;
     };
 
+    private enum ActiveLevel
+    {
+        None,
+        Root,
+        Sub
+    }
+
+    private class NavigationIndex
+    {
+        public int root;
+        public int sub;
+    }
+
     private readonly List<Item> itemsList = new();
+
+    private ActiveLevel activeLevel = ActiveLevel.None;
+
+    private NavigationIndex navigationIndex = new()
+    {
+        root = -1,
+        sub = -1
+    };
 
     private bool isConnected = false;
     private bool isLoading = false;
-    private int currentIndex = -1;
-    private bool isActive = false;
     private bool onFocus = false;
-    private bool isActiveSub = false;
-    private int currentSubIndex = 0;
 
     private void Awake()
     {
@@ -73,20 +90,27 @@ public class MonitorAvailableQuests : MonoBehaviour
     private void OnFocus()
     {
         onFocus = true;
-        if(!isActiveSub) isActive = true;
+        if(activeLevel == ActiveLevel.None) activeLevel = ActiveLevel.Root;
+        if(itemsList.Count >= 1 && navigationIndex.root != -1 && itemsList[navigationIndex.root].inner.controls.onFocus)
+        {
+            itemsList[navigationIndex.root].inner.controls.isActive = true;
+        }
     }
     private void OnBlur()
     {
         onFocus = false;
-        isActive = false;
+        if(itemsList.Count >= 1)
+        {
+            itemsList[navigationIndex.root].inner.controls.isActive = false;
+        }
     }
 
-    private List<UIMonitorFactory.ListItem> GenerateGoals(List<MonitorsManager.QuestGoal> items)
+    private List<MonitorList.ListItem> GenerateGoals(List<MonitorsManager.QuestGoal> items)
     {
-        List<UIMonitorFactory.ListItem> list = new();
+        List<MonitorList.ListItem> list = new();
         foreach (var item in items)
         {
-            list.Add(new UIMonitorFactory.ListItem
+            list.Add(new MonitorList.ListItem
             {
                 label = item.name,
                 value = "x" + item.length
@@ -114,7 +138,6 @@ public class MonitorAvailableQuests : MonoBehaviour
 
     private void Render()
     {
-        StartCoroutine(UpdateMonitor());
 
         RectTransform navigationRect = startPlace.navigation;
         RectTransform blocksRect = startPlace.blocks;
@@ -169,7 +192,7 @@ public class MonitorAvailableQuests : MonoBehaviour
             for (int index = 0; index < inner.blocks.Count; index++)
             {
                 RectTransform rect = inner.blocks[index].GetComponent<RectTransform>();
-                UIMonitorFactory.Instance.List(GenerateGoals(item.list[index].goals), rect, UIMonitorFactory.ListMode.Medium);
+                UIMonitorFactory.Instance.List(GenerateGoals(item.list[index].goals), rect, MonitorList.ListMode.Medium);
 
                 GameObject footerBlock = UIMonitorFactory.Instance.Layout("vertical", 24f, rect);
                 RectTransform footerBlockRect = footerBlock.GetComponent<RectTransform>();
@@ -192,8 +215,8 @@ public class MonitorAvailableQuests : MonoBehaviour
             RectTransform pagination = inner.pagination.GetComponent<RectTransform>();
             pagination.SetParent(footerRect);
 
-            block.SetActive(indexItem == currentIndex);
-            button.GetComponent<LocalEventManager>().Invoke(currentIndex == indexItem ? "OnFocus" : "OnBlur");
+            block.SetActive(indexItem == navigationIndex.root);
+            button.GetComponent<LocalEventManager>().Invoke(indexItem == navigationIndex.root ? "OnFocus" : "OnBlur");
 
             itemsList.Add(new Item
             {
@@ -212,18 +235,20 @@ public class MonitorAvailableQuests : MonoBehaviour
     {
         if(!onFocus) return;
         
-        if (!isConnected && !isLoading && isActive)
+        if (!isConnected && !isLoading && activeLevel == ActiveLevel.Root)
         {
-            isLoading = true;
             isConnected = true;
             textPopup.wrapper.SetActive(false);
+
+            isLoading = true;
+            loadingPopup.SetActive(true);
             StartCoroutine(ConnectToStation());
             Render();
         }
 
-        if (!isActive && isActiveSub)
+        if (activeLevel == ActiveLevel.Sub)
         {
-            if (currentSubIndex == 0 && currentIndex != -1) Accept();
+            if (navigationIndex.sub == 0) Accept();
         }
     }
 
@@ -231,57 +256,64 @@ public class MonitorAvailableQuests : MonoBehaviour
     {
         yield return _waitForSeconds1;
         isConnected = true;
-    }
-
-    IEnumerator UpdateMonitor()
-    {
-        isLoading = true;
-        loadingPopup.SetActive(true);
-        yield return _waitForSeconds1;
         isLoading = false;
         loadingPopup.SetActive(false);
     }
 
+    IEnumerator UpdateMonitor(bool success)
+    {
+        isLoading = true;
+        loadingPopup.SetActive(true);
+        yield return _waitForSeconds1;
+
+        loadingPopup.GetComponentInChildren<TMP_Text>().text = success == true ? "Success" : "Fail";
+        yield return _waitForSeconds1;
+
+        isLoading = false;
+        loadingPopup.SetActive(false);
+        loadingPopup.GetComponentInChildren<TMP_Text>().text = "Loading";
+    }
+
     private void Accept()
     {
-        int paged = itemsList[currentIndex].inner.controls.paged;
+        int paged = itemsList[navigationIndex.root].inner.controls.paged;
         int questIndex = paged - 1;
-        MonitorsManager.QuestElement quest = manager.quests[currentIndex].list[questIndex];
+        MonitorsManager.QuestElement quest = manager.quests[navigationIndex.root].list[questIndex];
 
-        manager.quests[currentIndex].list.Remove(quest);
-        manager.AcceptQuest(manager.quests[currentIndex], quest);
-        int questsLength = manager.quests[currentIndex].list.Count;
+        manager.quests[navigationIndex.root].list.Remove(quest);
+        manager.AcceptQuest(manager.quests[navigationIndex.root], quest);
+        int questsLength = manager.quests[navigationIndex.root].list.Count;
 
         if(questsLength == 1)
         {
-            itemsList[currentIndex].inner.pagination.GetComponent<LocalEventManager>().Invoke("OnBlur");
-            currentSubIndex = 0;
+            itemsList[navigationIndex.root].inner.pagination.GetComponent<LocalEventManager>().Invoke("OnBlur");
+            navigationIndex.sub = 0;
         }
 
         if(questsLength == 0)
         {
-            currentSubIndex = -1;
-            manager.quests.Remove(manager.quests[currentIndex]);
-            currentIndex = -1;
-            isActiveSub = false;
-            isActive = true;
+            navigationIndex.sub = -1;
+            manager.quests.Remove(manager.quests[navigationIndex.root]);
+            navigationIndex.root = -1;
+            activeLevel = ActiveLevel.Root;
         }
 
+        StartCoroutine(UpdateMonitor(true));
         Render();
         
-        if(currentIndex >= 0)
+        if(navigationIndex.root >= 0)
         {
-            int newPages = itemsList[currentIndex].inner.controls.pages;
+            int newPages = itemsList[navigationIndex.root].inner.controls.pages;
             int newPaged = newPages <= paged ? newPages : paged;
             if(newPages > 1)
             {
-                itemsList[currentIndex].inner.controls.paged = newPaged;
-                itemsList[currentIndex].inner.controls.UpdatePages();
+                itemsList[navigationIndex.root].inner.controls.paged = newPaged;
+                itemsList[navigationIndex.root].inner.controls.UpdatePages();
             }
             
             if(questsLength >= 1)
             {
-                itemsList[currentIndex].submit[newPaged - 1].GetComponent<LocalEventManager>().Invoke("OnFocus");
+                itemsList[navigationIndex.root].submit[newPaged - 1].GetComponent<LocalEventManager>().Invoke("OnFocus");
             }
         }
         
@@ -289,7 +321,7 @@ public class MonitorAvailableQuests : MonoBehaviour
 
     private void SelectButton(int index)
     {
-        currentIndex = index;
+        navigationIndex.root = index;
 
         for (int i = 0; i < itemsList.Count; i++)
         {
@@ -305,42 +337,41 @@ public class MonitorAvailableQuests : MonoBehaviour
 
     private void ProcessSubNavigate(Vector2 direction)
     {
-        if (!isActiveSub) return;
+        if (activeLevel != ActiveLevel.Sub) return;
 
-        LocalEventManager paginationEvents = itemsList[currentIndex].inner.pagination.GetComponent<LocalEventManager>();
-        bool paginationIsActive = itemsList[currentIndex].inner.controls.wrapper.activeSelf;
+        LocalEventManager paginationEvents = itemsList[navigationIndex.root].inner.pagination.GetComponent<LocalEventManager>();
+        bool paginationIsActive = itemsList[navigationIndex.root].inner.controls.wrapper.activeSelf;
         int maxItems = paginationIsActive ? 2 : 1;
 
-        int paged = itemsList[currentIndex].inner.controls.paged;
+        int paged = itemsList[navigationIndex.root].inner.controls.paged;
         if(paged == 0 && paginationIsActive)
         {
             paginationEvents.Invoke("OnFocus");
             return;
         }
 
-        LocalEventManager submitEvents = itemsList[currentIndex].submit[paged - 1].GetComponent<LocalEventManager>();
+        LocalEventManager submitEvents = itemsList[navigationIndex.root].submit[paged - 1].GetComponent<LocalEventManager>();
 
-        if (direction.x < -0.5f && isActiveSub && (paged == 1 || currentSubIndex == 0))
+        if (direction.x < -0.5f && (paged == 1 || navigationIndex.sub == 0))
         {
-            isActive = true;
-            isActiveSub = false;
+            activeLevel = ActiveLevel.Root;
             submitEvents.Invoke("OnBlur");
             if(paginationIsActive) paginationEvents.Invoke("OnBlur");
             return;
         }
 
-        currentSubIndex = direction.y switch
+        navigationIndex.sub = direction.y switch
         {
-            < -0.5f => currentSubIndex + 1,
-            > 0.5f => currentSubIndex - 1,
-            _ => currentSubIndex,
+            < -0.5f => navigationIndex.sub + 1,
+            > 0.5f => navigationIndex.sub - 1,
+            _ => navigationIndex.sub,
         };
 
-        if(currentSubIndex >= maxItems) currentSubIndex = 0;
-        else if(currentSubIndex < 0) currentSubIndex = maxItems - 1;
+        if(navigationIndex.sub >= maxItems) navigationIndex.sub = 0;
+        else if(navigationIndex.sub < 0) navigationIndex.sub = maxItems - 1;
 
-        submitEvents.Invoke(currentSubIndex == 0 ? "OnFocus" : "OnBlur");
-        if(paginationIsActive) paginationEvents.Invoke(currentSubIndex == 1 ? "OnFocus" : "OnBlur");
+        submitEvents.Invoke(navigationIndex.sub == 0 ? "OnFocus" : "OnBlur");
+        if(paginationIsActive) paginationEvents.Invoke(navigationIndex.sub == 1 ? "OnFocus" : "OnBlur");
     }
 
     private void OnNavigate(Vector2 direction)
@@ -349,30 +380,28 @@ public class MonitorAvailableQuests : MonoBehaviour
 
         if (itemsList.Count == 0 || !isConnected || isLoading) return;
 
-        if (isActive)
+        if (activeLevel == ActiveLevel.Root)
         {
-            if (direction.x > 0.5f && !isActiveSub)
+            if (direction.x > 0.5f && itemsList[navigationIndex.root].inner.controls.pages >= 2)
             {
-                isActive = false;
-                isActiveSub = true;
-                if(currentSubIndex == 1) itemsList[currentIndex].inner.controls.paged = 0;
+                activeLevel = ActiveLevel.Sub;
+                if(navigationIndex.sub == 1) itemsList[navigationIndex.root].inner.controls.paged = 0;
+                if(navigationIndex.sub == -1) navigationIndex.sub = 0;
                 ProcessSubNavigate(direction);
                 return;
             }
 
             if (direction.y < -0.5f)
             {
-                currentIndex++;
-                if (currentIndex >= itemsList.Count) currentIndex = 0;
-                SelectButton(currentIndex);
-                if(currentSubIndex != 0) currentSubIndex = 0;
+                navigationIndex.root++;
+                if (navigationIndex.root >= itemsList.Count) navigationIndex.root = 0;
+                SelectButton(navigationIndex.root);
             }
             else if (direction.y > 0.5f)
             {
-                currentIndex--;
-                if (currentIndex < 0) currentIndex = itemsList.Count - 1;
-                SelectButton(currentIndex);
-                if(currentSubIndex != 0) currentSubIndex = 0;
+                navigationIndex.root--;
+                if (navigationIndex.root < 0) navigationIndex.root = itemsList.Count - 1;
+                SelectButton(navigationIndex.root);
             }
         }
 

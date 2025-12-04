@@ -9,6 +9,7 @@ public class MonitorLoad : MonoBehaviour
 {
     private LocalEventManager events;
     private MonitorsManager manager;
+    private LocalEventManager managerEvents;
     private MonitorControls controls;
 
     private Canvas canvas;
@@ -30,9 +31,9 @@ public class MonitorLoad : MonoBehaviour
 
     private class NavigationIndex
     {
-        public int? root;
-        public int? wagonsList;
-        public int? wagonItem;
+        public int root;
+        public int wagonsList;
+        public int wagonItem;
     }
 
     private class Wagon
@@ -53,14 +54,14 @@ public class MonitorLoad : MonoBehaviour
     private List<Cargo> cargos = new();
     private List<Wagon> wagons = new();
 
-    private NavigationIndex currentIndex = new()
-    {
-        root = 0,
-        wagonsList = null,
-        wagonItem = null
-    };
-    
     private ActiveLevel activeLevel = ActiveLevel.None;
+
+    private NavigationIndex navigationIndex = new()
+    {
+        root = -1,
+        wagonsList = -1,
+        wagonItem = -1
+    };
 
     private bool isConnected = false;
     private bool isLoading = false;
@@ -75,6 +76,8 @@ public class MonitorLoad : MonoBehaviour
         controls = new MonitorControls();
         events = GetComponent<LocalEventManager>();
         manager = MonitorsManager.Instance;
+
+        managerEvents = manager.GetComponent<LocalEventManager>();
     }
 
     void OnEnable()
@@ -107,23 +110,23 @@ public class MonitorLoad : MonoBehaviour
     {
         onFocus = false;
 
-        if (currentIndex.wagonItem == 0 && currentIndex.wagonsList != null)
+        if (navigationIndex.wagonItem == 0 && navigationIndex.wagonsList != -1)
         {
-            LocalEventManager amountEvents = wagons[currentIndex.wagonsList ?? 0].amount.GetComponent<LocalEventManager>();
+            LocalEventManager amountEvents = wagons[navigationIndex.wagonsList].amount.GetComponent<LocalEventManager>();
             amountEvents.Invoke("OnDisactive");
         }
     }
 
-    private List<UIMonitorFactory.ListItem> GenerateWagonInfo(MonitorsManager.Wagon item)
+    private List<MonitorList.ListItem> GenerateWagonInfo(MonitorsManager.Wagon item)
     {
-        List<UIMonitorFactory.ListItem> list = new()
+        List<MonitorList.ListItem> list = new()
         {
-            new UIMonitorFactory.ListItem
+            new MonitorList.ListItem
             {
                 label = "Current Load",
                 value = item.currentLoad + " kg"
             },
-            new UIMonitorFactory.ListItem
+            new MonitorList.ListItem
             {
                 label = "Capacity",
                 value = item.capacity + " kg"
@@ -191,7 +194,7 @@ public class MonitorLoad : MonoBehaviour
             blockLayout.childAlignment = TextAnchor.UpperCenter;
             block.SetActive(false);
 
-            GameObject info = UIMonitorFactory.Instance.List(GenerateWagonInfo(item), blockRect, UIMonitorFactory.ListMode.Medium);
+            GameObject info = UIMonitorFactory.Instance.List(GenerateWagonInfo(item), blockRect, MonitorList.ListMode.Medium);
             GameObject amount = UIMonitorFactory.Instance.Counter("Amount", blockRect);
             MonitorCounter counterSettings = amount.GetComponent<MonitorCounter>();
             counterSettings.maxValue = Math.Min(item.capacity - item.currentLoad, manager.cargos[0].available);
@@ -216,18 +219,15 @@ public class MonitorLoad : MonoBehaviour
             });
         }
 
-        if(currentIndex.wagonsList != null)
-        {
-            SelectButton(currentIndex.wagonsList ?? 0);
-        }
+        SelectButton(navigationIndex.wagonsList);
 
-        if(currentIndex.wagonItem != null)
+        if(navigationIndex.wagonItem != -1)
         {
-            LocalEventManager amountEvents = wagons[currentIndex.wagonsList ?? 0].amount.GetComponent<LocalEventManager>();
-            LocalEventManager submitEvents = wagons[currentIndex.wagonsList ?? 0].submit.GetComponent<LocalEventManager>();
+            LocalEventManager amountEvents = wagons[navigationIndex.wagonsList].amount.GetComponent<LocalEventManager>();
+            LocalEventManager submitEvents = wagons[navigationIndex.wagonsList].submit.GetComponent<LocalEventManager>();
 
-            if(currentIndex.wagonItem == 0) amountEvents.Invoke("OnFocus");
-            if(currentIndex.wagonItem == 1) submitEvents.Invoke("OnFocus");
+            if(navigationIndex.wagonItem == 0) amountEvents.Invoke("OnFocus");
+            if(navigationIndex.wagonItem == 1) submitEvents.Invoke("OnFocus");
         }
     }
 
@@ -258,29 +258,30 @@ public class MonitorLoad : MonoBehaviour
 
         if (activeLevel == ActiveLevel.WagonItem)
         {
-            if (currentIndex.wagonItem == 1) SubmitLoad();
+            if (navigationIndex.wagonItem == 1) SubmitLoad();
         }
     }
 
     private void SubmitLoad()
     {
-        MonitorCounter amount = wagons[currentIndex.wagonsList ?? 0].amount.GetComponent<MonitorCounter>();
+        MonitorCounter amount = wagons[navigationIndex.wagonsList].amount.GetComponent<MonitorCounter>();
         if(amount.value <= 0) return;
 
         isLoading = true;
         loadingPopup.SetActive(true);
         StartCoroutine(LoadAfter(true));
         
-        manager.cargos[currentIndex.root ?? 0].available -= amount.value;
-        manager.wagons[currentIndex.wagonsList ?? 0].currentLoad += amount.value;
+        manager.cargos[navigationIndex.root].available -= amount.value;
+        manager.wagons[navigationIndex.wagonsList].currentLoad += amount.value;
 
-        SelectTabButton(currentIndex.root ?? 0);
+        SelectTabButton(navigationIndex.root);
+        managerEvents.Invoke("OnLoadCargo");
         Render();
     }
 
     private void SelectTabButton(int index)
     {
-        currentIndex.root = index;
+        navigationIndex.root = index;
 
         for (int i = 0; i < cargos.Count; i++)
         {
@@ -293,7 +294,7 @@ public class MonitorLoad : MonoBehaviour
 
     private void SelectButton(int index)
     {
-        currentIndex.wagonsList = index;
+        navigationIndex.wagonsList = index;
 
         for (int i = 0; i < wagons.Count; i++)
         {
@@ -302,104 +303,100 @@ public class MonitorLoad : MonoBehaviour
             wagons[i].block.SetActive(i == index);
 
             MonitorCounter counterSettings = wagons[i].amount.GetComponent<MonitorCounter>();
-            counterSettings.maxValue = Math.Min(manager.wagons[i].capacity - manager.wagons[i].currentLoad, manager.cargos[currentIndex.root ?? 0].available);
+            counterSettings.maxValue = Math.Min(manager.wagons[i].capacity - manager.wagons[i].currentLoad, manager.cargos[navigationIndex.root].available);
         }
     }
 
     private void TabsNavigate(Vector2 direction)
     {
         if (activeLevel != ActiveLevel.Root) return;
-        if(currentIndex.root == null) return;
         
         int max = cargos.Count;
 
         if (direction.y < -0.5f)
         {
             activeLevel = ActiveLevel.WagonsList;
-            currentIndex.wagonsList = -1;
             WagonsListNavigate(direction);
             return;
         }
 
-        currentIndex.root = direction.x switch
+        navigationIndex.root = direction.x switch
         {
-            < -0.5f => currentIndex.root - 1,
-            > 0.5f => currentIndex.root + 1,
-            _ => currentIndex.root,
+            < -0.5f => navigationIndex.root - 1,
+            > 0.5f => navigationIndex.root + 1,
+            _ => navigationIndex.root,
         };
 
-        if(currentIndex.root >= max) currentIndex.root = 0;
-        else if(currentIndex.root < 0) currentIndex.root = max - 1;
+        if(navigationIndex.root >= max) navigationIndex.root = 0;
+        else if(navigationIndex.root < 0) navigationIndex.root = max - 1;
 
-        SelectTabButton(currentIndex.root ?? 0);
+        SelectTabButton(navigationIndex.root);
     }
 
     private void WagonsListNavigate(Vector2 direction)
     {
         if (activeLevel != ActiveLevel.WagonsList) return;
-        if(currentIndex.wagonsList == null) return;
         
         int max = wagons.Count;
 
-        if (direction.y > 0.5f && currentIndex.wagonsList == 0)
+        if (direction.y > 0.5f && navigationIndex.wagonsList == 0)
         {
             activeLevel = ActiveLevel.Root;
+            navigationIndex.wagonsList = -1;
             SelectButton(-1);
-            currentIndex.wagonsList = null;
             return;
         }
 
         if (direction.x > 0.5f)
         {
             activeLevel = ActiveLevel.WagonItem;
-            currentIndex.wagonItem = 0;
+            navigationIndex.wagonItem = 0;
             WagonItemNavigate(direction);
             return;
         }
 
-        currentIndex.wagonsList = direction.y switch
+        navigationIndex.wagonsList = direction.y switch
         {
-            < -0.5f => currentIndex.wagonsList + 1,
-            > 0.5f => currentIndex.wagonsList - 1,
-            _ => currentIndex.wagonsList,
+            < -0.5f => navigationIndex.wagonsList + 1,
+            > 0.5f => navigationIndex.wagonsList - 1,
+            _ => navigationIndex.wagonsList,
         };
 
-        if(currentIndex.wagonsList >= max) currentIndex.wagonsList = 0;
-        else if(currentIndex.wagonsList < 0) currentIndex.wagonsList = max - 1;
+        if(navigationIndex.wagonsList >= max) navigationIndex.wagonsList = 0;
+        else if(navigationIndex.wagonsList < 0) navigationIndex.wagonsList = max - 1;
 
-        if(currentIndex.wagonsList != null) SelectButton(currentIndex.wagonsList ?? 0);
+        SelectButton(navigationIndex.wagonsList);
     }
 
     private void WagonItemNavigate(Vector2 direction)
     {
         if (activeLevel != ActiveLevel.WagonItem) return;
-        if(currentIndex.wagonItem == null) return;
         
         int max = 2;
-        LocalEventManager amountEvents = wagons[currentIndex.wagonsList ?? 0].amount.GetComponent<LocalEventManager>();
-        LocalEventManager submitEvents = wagons[currentIndex.wagonsList ?? 0].submit.GetComponent<LocalEventManager>();
+        LocalEventManager amountEvents = wagons[navigationIndex.wagonsList].amount.GetComponent<LocalEventManager>();
+        LocalEventManager submitEvents = wagons[navigationIndex.wagonsList].submit.GetComponent<LocalEventManager>();
 
         if (direction.x < -0.5f)
         {
             activeLevel = ActiveLevel.WagonsList;
-            currentIndex.wagonItem = null;
+            navigationIndex.wagonItem = -1;
             submitEvents.Invoke("OnBlur");
             amountEvents.Invoke("OnBlur");
             return;
         }
 
-        currentIndex.wagonItem = direction.y switch
+        navigationIndex.wagonItem = direction.y switch
         {
-            < -0.5f => currentIndex.wagonItem + 1,
-            > 0.5f => currentIndex.wagonItem - 1,
-            _ => currentIndex.wagonItem,
+            < -0.5f => navigationIndex.wagonItem + 1,
+            > 0.5f => navigationIndex.wagonItem - 1,
+            _ => navigationIndex.wagonItem,
         };
 
-        if(currentIndex.wagonItem >= max) currentIndex.wagonItem = 0;
-        else if(currentIndex.wagonItem < 0) currentIndex.wagonItem = max - 1;
+        if(navigationIndex.wagonItem >= max) navigationIndex.wagonItem = 0;
+        else if(navigationIndex.wagonItem < 0) navigationIndex.wagonItem = max - 1;
 
-        amountEvents.Invoke(currentIndex.wagonItem == 0 ? "OnFocus" : "OnBlur");
-        submitEvents.Invoke(currentIndex.wagonItem == 1 ? "OnFocus" : "OnBlur");
+        amountEvents.Invoke(navigationIndex.wagonItem == 0 ? "OnFocus" : "OnBlur");
+        submitEvents.Invoke(navigationIndex.wagonItem == 1 ? "OnFocus" : "OnBlur");
     }
 
     private void OnNavigate(Vector2 direction)
@@ -429,17 +426,4 @@ public class MonitorLoad : MonoBehaviour
         }
     }
 
-    private void OnChangeInput()
-    {
-        /* if(currentIndex != -1)
-        {
-            MonitorList total = itemsList[currentIndex].total.GetComponent<MonitorList>();
-            MonitorCounter counter = itemsList[currentIndex].counter.GetComponent<MonitorCounter>();
-            total.Render(
-                GenerateShopTotal(manager.shopProducts[currentIndex], counter.value),
-                itemsList[currentIndex].total.GetComponent<RectTransform>(),
-                UIMonitorFactory.ListMode.Large
-            );
-        } */
-    }
 }

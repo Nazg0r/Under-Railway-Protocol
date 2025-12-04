@@ -28,13 +28,29 @@ public class MonitorAcceptedQuests : MonoBehaviour
         public UIMonitorFactory.BlocksWithPagination inner;
     };
 
+    private enum ActiveLevel
+    {
+        None,
+        Root,
+        Sub
+    }
+
+    private class NavigationIndex
+    {
+        public int root;
+        public int sub;
+    }
+
     private readonly List<Item> itemsList = new();
 
+    private ActiveLevel activeLevel = ActiveLevel.None;
+    private NavigationIndex navigationIndex = new()
+    {
+        root = -1,
+        sub = -1
+    };
+
     private bool isLoading = false;
-    private int currentIndex = -1;
-    private int currentSubIndex = -1;
-    private bool isActive = false;
-    private bool isActiveSub = false;
     private bool onFocus = false;
 
     private void Awake()
@@ -69,20 +85,27 @@ public class MonitorAcceptedQuests : MonoBehaviour
     private void OnFocus()
     {
         onFocus = true;
-        if(!isActiveSub) isActive = true;
+        if(activeLevel == ActiveLevel.None) activeLevel = ActiveLevel.Root;
+        if(itemsList.Count >= 1 && navigationIndex.root != -1 && itemsList[navigationIndex.root].inner.controls.onFocus)
+        {
+            itemsList[navigationIndex.root].inner.controls.isActive = true;
+        }
     }
     private void OnBlur()
     {
         onFocus = false;
-        isActive = false;
+        if(itemsList.Count >= 1)
+        {
+            itemsList[navigationIndex.root].inner.controls.isActive = false;
+        }
     }
 
-    private List<UIMonitorFactory.ListItem> GenerateGoals(List<MonitorsManager.QuestGoal> items)
+    private List<MonitorList.ListItem> GenerateGoals(List<MonitorsManager.QuestGoal> items)
     {
-        List<UIMonitorFactory.ListItem> list = new();
+        List<MonitorList.ListItem> list = new();
         foreach (var item in items)
         {
-            list.Add(new UIMonitorFactory.ListItem
+            list.Add(new MonitorList.ListItem
             {
                 label = item.name,
                 value = "x" + item.length
@@ -166,7 +189,7 @@ public class MonitorAcceptedQuests : MonoBehaviour
             for (int index = 0; index < inner.blocks.Count; index++)
             {
                 RectTransform rect = inner.blocks[index].GetComponent<RectTransform>();
-                UIMonitorFactory.Instance.List(GenerateGoals(item.list[index].goals), rect, UIMonitorFactory.ListMode.Medium);
+                UIMonitorFactory.Instance.List(GenerateGoals(item.list[index].goals), rect, MonitorList.ListMode.Medium);
 
                 GameObject footerBlock = UIMonitorFactory.Instance.Layout("vertical", 24f, rect);
                 RectTransform footerBlockRect = footerBlock.GetComponent<RectTransform>();
@@ -187,8 +210,8 @@ public class MonitorAcceptedQuests : MonoBehaviour
             RectTransform pagination = inner.pagination.GetComponent<RectTransform>();
             pagination.SetParent(footerRect);
 
-            block.SetActive(indexItem == currentIndex);
-            button.GetComponent<LocalEventManager>().Invoke(currentIndex == indexItem ? "OnFocus" : "OnBlur");
+            block.SetActive(indexItem == navigationIndex.root);
+            button.GetComponent<LocalEventManager>().Invoke(indexItem == navigationIndex.root ? "OnFocus" : "OnBlur");
 
             itemsList.Add(new Item
             {
@@ -213,7 +236,7 @@ public class MonitorAcceptedQuests : MonoBehaviour
 
     private void SelectButton(int index)
     {
-        currentIndex = index;
+        navigationIndex.root = index;
 
         for (int i = 0; i < itemsList.Count; i++)
         {
@@ -229,31 +252,30 @@ public class MonitorAcceptedQuests : MonoBehaviour
 
     private void ProcessSubNavigate(Vector2 direction)
     {
-        if (!isActiveSub) return;
+        if (activeLevel != ActiveLevel.Sub) return;
 
-        LocalEventManager paginationEvents = itemsList[currentIndex].inner.pagination.GetComponent<LocalEventManager>();
-        bool paginationIsActive = itemsList[currentIndex].inner.controls.wrapper.activeSelf;
+        LocalEventManager paginationEvents = itemsList[navigationIndex.root].inner.pagination.GetComponent<LocalEventManager>();
+        bool paginationIsActive = itemsList[navigationIndex.root].inner.controls.wrapper.activeSelf;
         int maxItems = 0;
 
-        int paged = itemsList[currentIndex].inner.controls.paged;
+        int paged = itemsList[navigationIndex.root].inner.controls.paged;
         if(paged == 0 && paginationIsActive)
         {
             paginationEvents.Invoke("OnFocus");
             return;
         }
 
-        if (direction.x < -0.5f && isActiveSub && paged == 1)
+        if (direction.x < -0.5f && paged == 1)
         {
-            isActive = true;
-            isActiveSub = false;
+            activeLevel = ActiveLevel.Root;
             if(paginationIsActive) paginationEvents.Invoke("OnBlur");
             return;
         }
 
-        if(currentSubIndex >= maxItems) currentSubIndex = 0;
-        else if(currentSubIndex < 0) currentSubIndex = maxItems - 1;
+        if(navigationIndex.sub >= maxItems) navigationIndex.sub = 0;
+        else if(navigationIndex.sub < 0) navigationIndex.sub = maxItems - 1;
 
-        if(paginationIsActive) paginationEvents.Invoke(currentSubIndex == 0 ? "OnFocus" : "OnBlur");
+        if(paginationIsActive) paginationEvents.Invoke(navigationIndex.sub == 0 ? "OnFocus" : "OnBlur");
     }
 
     private void OnNavigate(Vector2 direction)
@@ -262,30 +284,30 @@ public class MonitorAcceptedQuests : MonoBehaviour
 
         if (itemsList.Count == 0 || isLoading) return;
 
-        if (isActive)
+        if (activeLevel == ActiveLevel.Root)
         {
-            if (direction.x > 0.5f && !isActiveSub)
+            if (direction.x > 0.5f && itemsList[navigationIndex.root].inner.controls.pages >= 2)
             {
-                isActive = false;
-                isActiveSub = true;
-                if(currentSubIndex == 0) itemsList[currentIndex].inner.controls.paged = 0;
+                activeLevel = ActiveLevel.Sub;
+
+                itemsList[navigationIndex.root].inner.controls.paged = 0;
+                if(navigationIndex.sub == -1) navigationIndex.sub = 0;
+
                 ProcessSubNavigate(direction);
                 return;
             }
 
             if (direction.y < -0.5f)
             {
-                currentIndex++;
-                if (currentIndex >= itemsList.Count) currentIndex = 0;
-                SelectButton(currentIndex);
-                if(currentSubIndex != 0) currentSubIndex = 0;
+                navigationIndex.root++;
+                if (navigationIndex.root >= itemsList.Count) navigationIndex.root = 0;
+                SelectButton(navigationIndex.root);
             }
             else if (direction.y > 0.5f)
             {
-                currentIndex--;
-                if (currentIndex < 0) currentIndex = itemsList.Count - 1;
-                SelectButton(currentIndex);
-                if(currentSubIndex != 0) currentSubIndex = 0;
+                navigationIndex.root--;
+                if (navigationIndex.root < 0) navigationIndex.root = itemsList.Count - 1;
+                SelectButton(navigationIndex.root);
             }
         }
 

@@ -12,6 +12,7 @@ public class MonitorShop : MonoBehaviour
 
     private Canvas canvas;
     private GameObject main;
+    private MonitorsManager manager;
 
     private GameObject loadingPopup;
     private MonitorTextPopup textPopup;
@@ -33,15 +34,32 @@ public class MonitorShop : MonoBehaviour
 
     private MonitorControls controls;
 
+    private UIMonitorFactory.StartPlace startPlace;
+
+    private enum ActiveLevel
+    {
+        None,
+        Root,
+        Sub
+    }
+
+    private class NavigationIndex
+    {
+        public int root;
+        public int sub;
+    }
+
+    private ActiveLevel activeLevel = ActiveLevel.None;
+
+    private NavigationIndex navigationIndex = new()
+    {
+        root = -1,
+        sub = -1
+    };
+
     private bool isConnected = false;
     private bool isLoading = false;
-    private int currentIndex = -1;
     private bool onFocus = false;
-    private bool isActive = false;
-    private bool isActiveSub = false;
-    private int currentSubIndex = 0;
-
-    private MonitorsManager manager;
 
     private void Awake()
     {
@@ -76,7 +94,7 @@ public class MonitorShop : MonoBehaviour
 
     private void OnFocus()
     {
-        if (!isActiveSub) isActive = true;
+        if (activeLevel == ActiveLevel.None) activeLevel = ActiveLevel.Root;
         onFocus = true;
     }
     
@@ -84,16 +102,14 @@ public class MonitorShop : MonoBehaviour
     {
         onFocus = false;
 
-        isActive = false;
-
-        if (currentSubIndex == 0)
+        if (navigationIndex.sub == 0)
         {
-            LocalEventManager counterEvents = itemsList[currentIndex].counter.GetComponent<LocalEventManager>();
+            LocalEventManager counterEvents = itemsList[navigationIndex.sub].counter.GetComponent<LocalEventManager>();
             counterEvents.Invoke("OnDisactive");
         }
     }
 
-    private List<UIMonitorFactory.ListItem> GenerateShopItemInfo(MonitorsManager.ShopProduct item)
+    private List<MonitorList.ListItem> GenerateShopItemInfo(MonitorsManager.ShopProduct item)
     {
         MonitorsManager.Product productItem = manager.playerData.products.Find(element => element.id == item.id);
         int available = 0;
@@ -102,19 +118,19 @@ public class MonitorShop : MonoBehaviour
             available = productItem.available;
         }
 
-        List<UIMonitorFactory.ListItem> list = new()
+        List<MonitorList.ListItem> list = new()
         {
-            new UIMonitorFactory.ListItem
+            new MonitorList.ListItem
             {
                 label = "Available",
                 value = item.available.ToString()
             },
-            new UIMonitorFactory.ListItem
+            new MonitorList.ListItem
             {
                 label = "Price per one",
                 value = item.pricePerOne + "$"
             },
-            new UIMonitorFactory.ListItem
+            new MonitorList.ListItem
             {
                 label = "You have",
                 value = available + "/100"
@@ -124,11 +140,11 @@ public class MonitorShop : MonoBehaviour
         return list;
     }
 
-    private List<UIMonitorFactory.ListItem> GenerateShopTotal(MonitorsManager.ShopProduct item, int count = 0)
+    private List<MonitorList.ListItem> GenerateShopTotal(MonitorsManager.ShopProduct item, int count = 0)
     {
-        List<UIMonitorFactory.ListItem> total = new()
+        List<MonitorList.ListItem> total = new()
         {
-            new UIMonitorFactory.ListItem
+            new MonitorList.ListItem
             {
                 label = "Total",
                 value = item.pricePerOne * count + "$"
@@ -151,12 +167,30 @@ public class MonitorShop : MonoBehaviour
         loadingPopup = UIMonitorFactory.Instance.LoadingPopup(canvasRect);
         loadingPopup.SetActive(false);
 
-        UIMonitorFactory.StartPlace startPlace = UIMonitorFactory.Instance.Start(mainRect);
+        startPlace = UIMonitorFactory.Instance.Start(mainRect);
+
+        Render();
+    }
+
+    public void Render()
+    {
         RectTransform navigationRect = startPlace.navigation;
         RectTransform blocksRect = startPlace.blocks;
-
+        
         float blockWidth = manager.blockWidth;
 
+        foreach (Transform child in navigationRect)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Transform child in blocksRect)
+        {
+            Destroy(child.gameObject);
+        }
+
+        itemsList.Clear();
+        
         foreach (var item in manager.shopProducts)
         {
             Button button = UIMonitorFactory.Instance.Button(item.title, 56, navigationRect);
@@ -197,11 +231,11 @@ public class MonitorShop : MonoBehaviour
             counterSettings.maxValue = item.available;
 
             LocalEventManager counterEvents = counter.GetComponent<LocalEventManager>();
-            counterEvents.Subscribe("OnActive", () => isActiveSub = false);
-            counterEvents.Subscribe("OnDisactive", () => isActiveSub = true);
+            counterEvents.Subscribe("OnActive", () => activeLevel = ActiveLevel.None);
+            counterEvents.Subscribe("OnDisactive", () => activeLevel = ActiveLevel.Sub);
             counterEvents.Subscribe("OnChange", () => OnChangeInput());
             
-            GameObject total = UIMonitorFactory.Instance.List(GenerateShopTotal(item), bodyRect, UIMonitorFactory.ListMode.Large);
+            GameObject total = UIMonitorFactory.Instance.List(GenerateShopTotal(item), bodyRect, MonitorList.ListMode.Large);
             Button submit = UIMonitorFactory.Instance.Button("Buy", 96f, bodyRect);
 
             itemsList.Add(new Item
@@ -214,6 +248,21 @@ public class MonitorShop : MonoBehaviour
                 total = total,
                 submit = submit
             });
+        }
+    
+        if(navigationIndex.root >= 0)
+        {
+            SelectButton(navigationIndex.root);
+
+            if(navigationIndex.sub == 0)
+            {
+                LocalEventManager counterEvents = itemsList[navigationIndex.root].counter.GetComponent<LocalEventManager>();
+                counterEvents.Invoke("OnFocus");
+            } else if(navigationIndex.sub == 1)
+            {
+                LocalEventManager submitEvents = itemsList[navigationIndex.root].submit.GetComponent<LocalEventManager>();
+                submitEvents.Invoke("OnFocus");
+            }
         }
     }
 
@@ -234,10 +283,10 @@ public class MonitorShop : MonoBehaviour
 
     private void Buy()
     {
-        MonitorCounter counter = itemsList[currentIndex].counter.GetComponent<MonitorCounter>();
+        MonitorCounter counter = itemsList[navigationIndex.root].counter.GetComponent<MonitorCounter>();
         if (counter.value <= 0) return;
 
-        MonitorsManager.ShopProduct item = manager.shopProducts[currentIndex];
+        MonitorsManager.ShopProduct item = manager.shopProducts[navigationIndex.root];
         int available = item.available;
 
         double price = item.pricePerOne * counter.value;
@@ -267,18 +316,13 @@ public class MonitorShop : MonoBehaviour
         }
         
         playerProductItem.available += counter.value;
-        
-        MonitorList info = itemsList[currentIndex].info.GetComponent<MonitorList>();
-        info.Render(GenerateShopItemInfo(item), itemsList[currentIndex].info.GetComponent<RectTransform>());
-        MonitorList total = itemsList[currentIndex].total.GetComponent<MonitorList>();
-        total.Render(GenerateShopTotal(item), itemsList[currentIndex].total.GetComponent<RectTransform>(), UIMonitorFactory.ListMode.Large);
 
-        counter.Reset();
+        Render();
     }
 
     private void OnSubmit()
     {
-        if (!isConnected && !isLoading && isActive)
+        if (!isConnected && !isLoading && activeLevel == ActiveLevel.Root)
         {
             isLoading = true;
             textPopup.wrapper.SetActive(false);
@@ -286,20 +330,19 @@ public class MonitorShop : MonoBehaviour
             StartCoroutine(LoadAfter());
         }
 
-        if (!isActive && isActiveSub)
+        if (activeLevel == ActiveLevel.Sub)
         {
-            if (currentSubIndex == 1) Buy();
+            if (navigationIndex.sub == 1) Buy();
         }
     }
-
+    
     private void SelectButton(int index)
     {
-        currentIndex = index;
+        navigationIndex.root = index;
 
         for (int i = 0; i < itemsList.Count; i++)
         {
             LocalEventManager buttonEvents = itemsList[i].button.GetComponent<LocalEventManager>();
-
             buttonEvents.Invoke(i == index ? "OnFocus" : "OnBlur");
         }
 
@@ -311,16 +354,15 @@ public class MonitorShop : MonoBehaviour
 
     private void ProcessSubNavigate(Vector2 direction)
     {
-        if (!isActiveSub) return;
+        if (activeLevel != ActiveLevel.Sub) return;
 
-        LocalEventManager counterEvents = itemsList[currentIndex].counter.GetComponent<LocalEventManager>();
-        LocalEventManager submitEvents = itemsList[currentIndex].submit.GetComponent<LocalEventManager>();
+        LocalEventManager counterEvents = itemsList[navigationIndex.root].counter.GetComponent<LocalEventManager>();
+        LocalEventManager submitEvents = itemsList[navigationIndex.root].submit.GetComponent<LocalEventManager>();
 
-        if (direction.x < -0.5f && isActiveSub)
+        if (direction.x < -0.5f)
         {
-            isActive = true;
-            isActiveSub = false;
-            currentSubIndex = -1;
+            activeLevel = ActiveLevel.Root;
+            navigationIndex.sub = -1;
             submitEvents.Invoke("OnBlur");
             counterEvents.Invoke("OnBlur");
             return;
@@ -328,21 +370,18 @@ public class MonitorShop : MonoBehaviour
 
         if (direction.y < -0.5f)
         {
-            currentSubIndex++;
-            if (currentSubIndex >= 2) currentSubIndex = 0;
+            navigationIndex.sub++;
+            if (navigationIndex.sub >= 2) navigationIndex.sub = 0;
 
         }
         else if (direction.y > 0.5f)
         {
-            currentSubIndex--;
-            if (currentSubIndex < 0)
-            {
-                currentSubIndex = 1;
-            }
+            navigationIndex.sub--;
+            if (navigationIndex.sub < 0) navigationIndex.sub = 1;
         }
 
-        counterEvents.Invoke(currentSubIndex == 0 ? "OnFocus" : "OnBlur");
-        submitEvents.Invoke(currentSubIndex == 1 ? "OnFocus" : "OnBlur");
+        counterEvents.Invoke(navigationIndex.sub == 0 ? "OnFocus" : "OnBlur");
+        submitEvents.Invoke(navigationIndex.sub == 1 ? "OnFocus" : "OnBlur");
 
     }
 
@@ -352,28 +391,27 @@ public class MonitorShop : MonoBehaviour
 
         if (itemsList.Count == 0 || !isConnected) return;
 
-        if (isActive)
+        if (activeLevel == ActiveLevel.Root)
         {
-            if (direction.x > 0.5f && !isActiveSub)
+            if (direction.x > 0.5f)
             {
-                isActive = false;
-                isActiveSub = true;
-                currentSubIndex = 0;
+                activeLevel = ActiveLevel.Sub;
+                navigationIndex.sub = 0;
                 ProcessSubNavigate(direction);
                 return;
             }
 
             if (direction.y < -0.5f)
             {
-                currentIndex++;
-                if (currentIndex >= itemsList.Count) currentIndex = 0;
-                SelectButton(currentIndex);
+                navigationIndex.root++;
+                if (navigationIndex.root >= itemsList.Count) navigationIndex.root = 0;
+                SelectButton(navigationIndex.root);
             }
             else if (direction.y > 0.5f)
             {
-                currentIndex--;
-                if (currentIndex < 0) currentIndex = itemsList.Count - 1;
-                SelectButton(currentIndex);
+                navigationIndex.root--;
+                if (navigationIndex.root < 0) navigationIndex.root = itemsList.Count - 1;
+                SelectButton(navigationIndex.root);
             }
         }
 
@@ -382,14 +420,14 @@ public class MonitorShop : MonoBehaviour
 
     private void OnChangeInput()
     {
-        if(currentIndex != -1)
+        if(navigationIndex.root != -1)
         {
-            MonitorList total = itemsList[currentIndex].total.GetComponent<MonitorList>();
-            MonitorCounter counter = itemsList[currentIndex].counter.GetComponent<MonitorCounter>();
+            MonitorList total = itemsList[navigationIndex.root].total.GetComponent<MonitorList>();
+            MonitorCounter counter = itemsList[navigationIndex.root].counter.GetComponent<MonitorCounter>();
             total.Render(
-                GenerateShopTotal(manager.shopProducts[currentIndex], counter.value),
-                itemsList[currentIndex].total.GetComponent<RectTransform>(),
-                UIMonitorFactory.ListMode.Large
+                GenerateShopTotal(manager.shopProducts[navigationIndex.root], counter.value),
+                itemsList[navigationIndex.root].total.GetComponent<RectTransform>(),
+                MonitorList.ListMode.Large
             );
         }
     }

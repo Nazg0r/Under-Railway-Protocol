@@ -9,6 +9,8 @@
 [Bb]uilds/
 [Ll]ogs/
 UserSettings/
+Assets/_Recovery/
+Assets/TextMesh Pro/Examples & Extras/
 
 # Crash reports and temporary files
 MemoryCaptures/
@@ -20,6 +22,7 @@ sysinfo.txt
 
 # Shader cache
 *.shadercache
+
 
 # GI cache
 [Aa]sset[Ss]tore/
@@ -50,6 +53,7 @@ Assets/StreamingAssets/AssetBundles/
 # ============ #
 
 .vscode/
+.vs/
 .idea/
 *.csproj
 *.unityproj
@@ -92,9 +96,6 @@ Packages/com.unity.package-manager-do-not-modify/
 
 # Plastic SCM
 PlasticSCM/
-
-# Ignore auto-generated meta files outside Assets
-*.meta
 
 # Uncomment if you use Addressables and want to ignore cache
 # /Library/com.unity.addressables/

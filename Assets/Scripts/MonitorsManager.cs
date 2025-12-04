@@ -171,8 +171,6 @@ public class MonitorsManager : MonoBehaviour
             item.list.Add(questElement);
         }
 
-        Debug.Log(item.station);
-
         events.Invoke("UpdateAcceptedQuests");
     }
 

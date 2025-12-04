@@ -8,6 +8,7 @@ public class UIMonitorFactory
     private static UIMonitorFactory _instance;
     public static UIMonitorFactory Instance => _instance ??= new UIMonitorFactory();
     private GameObject header;
+    private GameObject mainTitle;
     private GameObject loadingPopup;
     private GameObject textPopup;
     private GameObject text;
@@ -15,12 +16,8 @@ public class UIMonitorFactory
     private GameObject counterPrefab;
     private GameObject paginationPrefab;
     private RawImage tabsBorder;
-
-    public class ListItem
-    {
-        public string label;
-        public string value;
-    }
+    private RawImage radiationIcon;
+    private RawImage celsiusIcon;
 
     public class StartPlace
     {
@@ -36,16 +33,10 @@ public class UIMonitorFactory
         public MonitorPagination controls;
     }
 
-    public enum ListMode
-    {
-        Default,
-        Medium,
-        Large
-    }
-
     public void Init()
     {
         header = Resources.Load<GameObject>("Monitors/Components/Header");
+        mainTitle = Resources.Load<GameObject>("Monitors/Components/MainTitle");
         loadingPopup = Resources.Load<GameObject>("Monitors/Components/LoadingPopup");
         textPopup = Resources.Load<GameObject>("Monitors/Components/TextPopup");
         button = Resources.Load<Button>("Monitors/Components/Button");
@@ -53,6 +44,8 @@ public class UIMonitorFactory
         counterPrefab = Resources.Load<GameObject>("Monitors/Components/Counter");
         paginationPrefab = Resources.Load<GameObject>("Monitors/Components/Pagination");
         tabsBorder = Resources.Load<RawImage>("Monitors/Components/TabsBorder");
+        radiationIcon = Resources.Load<RawImage>("Monitors/Components/RadiationIcon");
+        celsiusIcon = Resources.Load<RawImage>("Monitors/Components/CelsiusIcon");
     }
 
     public MonitorHeader Header(string title, string infoName, string infoValue, RectTransform wrapper)
@@ -77,6 +70,25 @@ public class UIMonitorFactory
         if (components.InfoValue().TryGetComponent<TextMeshProUGUI>(out var infoItemValue))
         {
             infoItemValue.text = infoValue;
+        }
+
+        Canvas.ForceUpdateCanvases();
+
+        return components;
+    }
+
+    public MonitorMainTitle MainTitle(string title, RectTransform wrapper)
+    {
+        GameObject titleObject = Object.Instantiate(mainTitle, wrapper);
+
+        RectTransform rt = titleObject.GetComponent<RectTransform>();
+        rt.pivot = new Vector2(0.5f, 0f);
+        rt.anchoredPosition = new Vector2(0, 550);
+
+        MonitorMainTitle components = titleObject.GetComponent<MonitorMainTitle>();
+        if (components.Title().TryGetComponent<TextMeshProUGUI>(out var titleValue))
+        {
+            titleValue.text = title;
         }
 
         Canvas.ForceUpdateCanvases();
@@ -163,14 +175,14 @@ public class UIMonitorFactory
         return textObject;
     }
 
-    public GameObject List(List<ListItem> list, RectTransform wrapper, ListMode mode = ListMode.Default)
+    public GameObject List(List<MonitorList.ListItem> list, RectTransform wrapper, MonitorList.ListMode mode = MonitorList.ListMode.Default)
     {
         GameObject listObject = new("List");
         listObject.transform.SetParent(wrapper, false);
         RectTransform listRect = listObject.AddComponent<RectTransform>();
 
-        float height = mode == ListMode.Medium ? 128f : 64f;
-        listRect.sizeDelta = new Vector2(964f, 100f + (height * list.Count) + (16f * list.Count));
+        float height = mode == MonitorList.ListMode.Medium ? 128f : 64f;
+        listRect.sizeDelta = new Vector2(mode == MonitorList.ListMode.MediumLarge ? 1650f : 964f, 100f + (height * list.Count) + (16f * list.Count));
 
         VerticalLayoutGroup listLayout = listObject.AddComponent<VerticalLayoutGroup>();
         listLayout.childControlHeight = false;
@@ -181,6 +193,8 @@ public class UIMonitorFactory
 
         MonitorList listFactory = listObject.AddComponent<MonitorList>();
         listFactory.text = text;
+        listFactory.radiationIcon = radiationIcon;
+        listFactory.celsiusIcon = celsiusIcon;
         listFactory.Render(list, listRect, mode);
 
         Canvas.ForceUpdateCanvases();
