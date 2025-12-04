@@ -42,7 +42,7 @@ public class MonitorsManager : MonoBehaviour
     public class Wagon
     {
         public string id;
-        public string name;
+        public string title;
         public int currentLoad;
         public int capacity;
     }
@@ -50,7 +50,7 @@ public class MonitorsManager : MonoBehaviour
     public class Cargo
     {
         public string id;
-        public string name;
+        public string title;
         public int available;
     }
 
@@ -78,7 +78,7 @@ public class MonitorsManager : MonoBehaviour
     public List<Wagon> wagons = new();
     public List<Cargo> cargos = new();
 
-    private void GenerateShopItems()
+    private void GenerateShopProducts()
     {
         string[] ids = new[] { "coal", "refrigirant", "power_cell", "regulator", "fuse" };
         string[] titles = new[] { "Coal", "Refrigirant", "Power Cell", "Regulator", "Fuse" };
@@ -175,6 +175,41 @@ public class MonitorsManager : MonoBehaviour
         events.Invoke("UpdateAcceptedQuests");
     }
 
+    private void GenerateWagons()
+    {
+        string[] ids = new[] { "wagon_1", "wagon_2", "wagon_3" };
+        string[] titles = new[] { "WGN-01", "WGN-02", "WGN-03" };
+        int[] capacity = new[] { 2000, 3000, 5000 };
+
+        for (int index = 0; index < ids.Length; index++)
+        {
+            wagons.Add(new Wagon
+            {
+                id = ids[index],
+                title = titles[index],
+                currentLoad = 0,
+                capacity = capacity[index]
+            });
+        }
+    }
+
+    private void GenerateCargos()
+    {
+        string[] ids = new[] { "sigma_8", "protein", "sigma_line" };
+        string[] titles = new[] { "Sigma-8", "Protein powder", "Sigma Line" };
+        int[] available = new[] { 2000, 2000, 1000 };
+
+        for (int index = 0; index < ids.Length; index++)
+        {
+            cargos.Add(new Cargo
+            {
+                id = ids[index],
+                title = titles[index],
+                available = available[index]
+            });
+        }
+    }
+
     void Awake()
     {
         if (Instance == null)
@@ -188,7 +223,9 @@ public class MonitorsManager : MonoBehaviour
         }
 
         events = GetComponent<LocalEventManager>();
-        GenerateShopItems();
+        GenerateShopProducts();
         GenerateQuests();
+        GenerateWagons();
+        GenerateCargos();
     }
 }
