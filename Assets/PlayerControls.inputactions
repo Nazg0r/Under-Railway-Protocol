@@ -29,6 +29,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Interact",
+            "id": "32fdcd86-d80a-4f1e-bf88-6cd2744763b8",
+            "actions": [
+                {
+                    "name": "Focus",
+                    "type": "Button",
+                    "id": "3aa06fe6-1271-4216-bb41-e417df227849",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Blur",
+                    "type": "Button",
+                    "id": "9da25a3a-911c-4152-942a-c91e501ae2ba",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a3ad39df-039c-4d0c-b139-717edc8e434a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Focus",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e15d4a83-0832-4ea8-9939-8899a63f4af6",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Blur",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
