@@ -17,6 +17,8 @@ MonoBehaviour:
     Configs:
     - OutDirections: 0200000000000000
       InDirections: 00000000
+    - OutDirections: 0000000002000000
+      InDirections: 
   - BranchType: 3
     Configs:
     - OutDirections: 0200000003000000
@@ -29,8 +31,6 @@ MonoBehaviour:
       InDirections: 
   - BranchType: 2
     Configs:
-    - OutDirections: 
-      InDirections: 
     - OutDirections: 0000000003000000
       InDirections: 00000000
   - BranchType: 0
@@ -41,3 +41,35 @@ MonoBehaviour:
       InDirections: 
     - OutDirections: 
       InDirections: 00000000
+  - BranchType: 9
+    Configs:
+    - OutDirections: 0200000000000000
+      InDirections: 02000000
+  - BranchType: 10
+    Configs:
+    - OutDirections: 0300000000000000
+      InDirections: 02000000
+  - BranchType: 11
+    Configs:
+    - OutDirections: 0200000003000000
+      InDirections: 02000000
+  - BranchType: 12
+    Configs:
+    - OutDirections: 020000000300000000000000
+      InDirections: 02000000
+  - BranchType: 5
+    Configs:
+    - OutDirections: 0200000000000000
+      InDirections: 03000000
+  - BranchType: 6
+    Configs:
+    - OutDirections: 0300000000000000
+      InDirections: 03000000
+  - BranchType: 7
+    Configs:
+    - OutDirections: 0300000002000000
+      InDirections: 03000000
+  - BranchType: 8
+    Configs:
+    - OutDirections: 030000000200000000000000
+      InDirections: 03000000
