@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
 	public Station CurrentStation { get; private set; }
 	public Station SecondStation { get; private set; }
+	public Vector2 Delta { get; set; }
 
 	public async Task Initialize()
     {
