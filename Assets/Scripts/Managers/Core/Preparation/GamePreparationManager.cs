@@ -4,6 +4,8 @@ public class GamePreparationManager : MonoBehaviour
 {
 	[SerializeField] MapGenerationManager _mapGenerationManager;
 	[SerializeField] MapMonitorPreparationManager _mapMonitorPreparationManager;
+	[SerializeField] WorldMapBuildingPreparationManager _worldMapBuildingPreparationManager;
+
 	[SerializeField] private InputSwitcher _inputSwitcher;
 
 	private GameManager _gameManager;
@@ -23,6 +25,7 @@ public class GamePreparationManager : MonoBehaviour
 			_inputSwitcher.Initialize();
 			_mapGenerationManager.Initialize();
 			_mapMonitorPreparationManager.Initialize();
+			_worldMapBuildingPreparationManager.Initialize();
 		}
 	}
 }
