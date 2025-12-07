@@ -32,33 +32,27 @@ public class WorldMapPathMapBuildingManager : MonoBehaviour
 		};
 	}
 
-	// private void CreateRailroads(PathMap pathMap,Transform parent)
-	// {
-	// 	var pathMaps = _mapManager.Map.GetPathMaps().Take(1);
-	//
-	// 	foreach (var pathMap in pathMaps)
-	// 		CreatePathMap(pathMap, parent);
-	// }
-
-	public void CreatePathMap(PathMap pathMap, Transform parent)
+	public Vector2 CreatePathMap(Vector2 delta, PathMap pathMap, Transform parent)
 	{
 		GameObject pathMapContainer = new GameObject($"PathMap-{pathMap.Id}");
 		pathMapContainer.transform.SetParent(parent.transform, false);
 
 		var railroads = pathMap.GetRailroads();
 
+		var branchContainer = _branchBuildingManager.CreateBranches(delta, pathMap, pathMapContainer.transform);
+		delta = GetNewDeltaAfterBranchesCreated(branchContainer);
+
 		for (var i = 0; i < railroads.Count; i++)
 		{
 			var railroad = railroads[i];
 			var name = $"Railroad{i}";
-			CreateRailroad(railroad, name, pathMapContainer.transform);
+			CreateRailroad(delta, railroad, name, pathMapContainer.transform);
 		}
 
-
-		_branchBuildingManager.CreateBranches(pathMap, pathMapContainer.transform);
+		return DefinePathMapEndDelta(branchContainer);
 	}
 
-	private void CreateRailroad(Railroad railroad, string railroadName, Transform parent)
+	private void CreateRailroad(Vector2 delta, Railroad railroad, string railroadName, Transform parent)
 	{
 		GameObject railroadContainer = new GameObject(railroadName);
 		railroadContainer.transform.SetParent(parent, false);
@@ -68,11 +62,11 @@ public class WorldMapPathMapBuildingManager : MonoBehaviour
 		for (int i = 1; i < pieces.Count - 1; i++)
 		{
 			var piece = pieces[i];
-			CreateRailroadPiece(piece, railroadContainer.transform);
+			CreateRailroadPiece(delta, piece, railroadContainer.transform);
 		}
 	}
 
-	private void CreateRailroadPiece(RailroadPiece piece, Transform parent)
+	private void CreateRailroadPiece(Vector2 delta, RailroadPiece piece, Transform parent)
 	{
 		Vector3 pos;
 		Quaternion angle;
@@ -87,6 +81,9 @@ public class WorldMapPathMapBuildingManager : MonoBehaviour
 			pos = GetLinePosition(piece);
 			angle = GetLineRotation(piece);
 		}
+
+		pos.x += delta.x;
+		pos.z += delta.y;
 
 		var prefab = _directionToPrefab[piece.Type];
 
@@ -123,5 +120,27 @@ public class WorldMapPathMapBuildingManager : MonoBehaviour
 			DirectionType.Right => Quaternion.Euler(0, -1 * (piece.Rotation.eulerAngles.y + RightRotationOffset), 0),
 			_ => Quaternion.identity
 		};
+	}
+
+	private Vector2 GetNewDeltaAfterBranchesCreated(Transform branchContainer)
+	{
+		var firsBranch = branchContainer.GetChild(0);
+		return new Vector2(
+			firsBranch.position.x,
+			firsBranch.position.z);
+
+	}
+
+	private Vector2 DefinePathMapEndDelta(Transform branchContainer)
+	{
+		var lastBranch = branchContainer.childCount > 0 ?
+			branchContainer.GetChild(branchContainer.childCount - 1) :
+			null;
+
+		var lastBranchSize = WorldMapBuildingHelper.GetComplexObjectSize(lastBranch);
+
+		return new Vector2(
+			lastBranch.transform.position.x + lastBranchSize.x / 2,
+			lastBranch.transform.position.z + lastBranchSize.z / 2);
 	}
 }
